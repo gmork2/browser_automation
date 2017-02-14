@@ -2,6 +2,8 @@ import logging
 import os
 from collections import ChainMap
 
+from conf.helpers import get_default_config_dir
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,3 +32,7 @@ class Config(object):
             'format': 1,
             'file': file_version
         }
+
+        # Load the config from file in the config_dir
+        self.__config_file = os.path.join(config_dir, 'conf', filename) \
+                if config_dir else get_default_config_dir(filename)
