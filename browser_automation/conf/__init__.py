@@ -90,3 +90,7 @@ class LazyConfig(LazyObject):
         Returns True if the settings have already been configured.
         """
         return self._wrapped is not empty
+
+config = LazyConfig()
+
+
