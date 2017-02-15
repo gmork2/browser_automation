@@ -125,3 +125,4 @@ class LazyObject(object):
     __iter__ = new_method_proxy(iter)
     __len__ = new_method_proxy(len)
     __contains__ = new_method_proxy(operator.contains)
+    
