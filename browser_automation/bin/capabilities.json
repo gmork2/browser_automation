@@ -1,0 +1,29 @@
+{
+  "a": {
+    "applicationCacheEnabled": false,
+    "rotatable": false,
+    "mobileEmulationEnabled": false,
+    "networkConnectionEnabled": false,
+    "chrome": {
+      "chromedriverVersion": "2.24.417431 (9aea000394714d2fbb20850021f6204f2256b9cf)",
+      "userDataDir": "C:\\Users\\hijod\\AppData\\Local\\Temp\\scoped_dir4700_17047"
+    },
+    "takesHeapSnapshot": true,
+    "pageLoadStrategy": "normal",
+    "databaseEnabled": false,
+    "handlesAlerts": true,
+    "hasTouchScreen": false,
+    "version": "54.0.2840.99",
+    "platform": "XP",
+    "browserConnectionEnabled": false,
+    "nativeEvents": true,
+    "acceptSslCerts": true,
+    "locationContextEnabled": true,
+    "webStorageEnabled": true,
+    "browserName": "chrome",
+    "takesScreenshot": true,
+    "javascriptEnabled": true,
+    "cssSelectorsEnabled": true
+  }
+}
+
