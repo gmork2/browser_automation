@@ -1,13 +1,35 @@
+import _pickle as pickle
+import json
 import logging
 import os
+import shutil
 from collections import ChainMap
 
+from utils.json import find_json_objects
 from conf.helpers import get_default_config_dir
 
 
 logger = logging.getLogger(__name__)
 
 class Config(object):
+    """
+    This class is used to access/create/modify config files. The format of the config
+    file is two json encoded dicts: <version dict> <content dict>
+    The version dict contains two keys: file and format.  The format version is
+    controlled by the Config class. It should only be changed when anything below
+    it is changed directly by the Config class.  An example of this would be if we
+    changed the serializer for the content to something different.
+    The config file version is changed by the 'owner' of the config file.  This is
+    to signify that there is a change in the naming of some config keys or something
+    similar along those lines.
+    The content is simply the dict to be saved and will be serialized before being
+    written.
+    Since the format of the config could change, there needs to be a way to have
+    the Config object convert to newer formats.  To do this, you will need to
+    register conversion functions for various versions of the config file. Note that
+    this can only be done for the 'config file version' and not for the 'format'
+    version as this will be done internally.
+    """
     def __new__(cls, filename=None, defaults=None, config_dir=None, file_version=1):
         # Implements a singleton pattern
         if not hasattr(cls, 'instance'):
@@ -105,3 +127,177 @@ class Config(object):
 
     def clear(self):
         self.__config.clear()
+
+    def register_change_callback(self, callback):
+        """
+        Register a callback function for any changed value. Will be
+        called when any value is changed in the config dictionary.
+        """
+        self.__change_callbacks.append(callback)
+
+    def register_set_function(self, key, function, apply_now=True):
+        """
+        Register a function to be called when a config value changes.
+        """
+        logger.debug('Registering function for %s key..', key)
+        if key not in self.__set_functions:
+            self.__set_functions[key] = []
+
+        self.__set_functions[key].append(function)
+
+        # Run the function now if apply_now is set
+        if apply_now:
+            function(key, self.__config[key])
+        return
+
+    def apply_all(self):
+        """
+        Calls all set functions.
+        """
+        logger.debug('Calling all set functions..')
+        for key, value in self.__set_functions.items():
+            for func in value:
+                func(key, self.__config[key])
+
+    def apply_set_functions(self, key):
+        logger.debug('Calling set functions for key %s..', key)
+        if key in self.__set_functions:
+            for func in self.__set_functions[key]:
+                func(key, self.__config[key])
+
+    def load(self, filename=None):
+        """
+        Load a config file.
+        """
+        if not filename:
+            filename = self.__config_file
+
+        try:
+            with open(filename, 'r') as _file:
+                data = _file.read()
+        except IOError as ex:
+            logger.warning('Unable to open config file %s: %s', filename, ex)
+            return
+
+        objects = find_json_objects(data)
+
+        if not len(objects):
+            # No json objects found, try depickling it
+            try:
+                self.__config.update(pickle.loads(data))
+            except Exception as ex:
+                logger.exception(ex)
+                logger.warning('Unable to load config file: %s', filename)
+        elif len(objects) == 1:
+            start, end = objects[0]
+            try:
+                self.__config.update(json.loads(data[start:end]))
+            except Exception as ex:
+                logger.exception(ex)
+                logger.warning('Unable to load config file: %s', filename)
+        elif len(objects) == 2:
+            try:
+                start, end = objects[0]
+                self.__version.update(json.loads(data[start:end]))
+                start, end = objects[1]
+                self.__config.update(json.loads(data[start:end]))
+            except Exception as ex:
+                logger.exception(ex)
+                logger.warning('Unable to load config file: %s', filename)
+
+        logger.debug('Config %s version: %s.%s loaded: %s', filename,
+                     self.__version['format'], self.__version['file'], self.__config)
+
+    def save(self, filename=None):
+        """
+        Save configuration to disk.
+        """
+        if not filename:
+            filename = self.__config_file
+        # Check to see if the current config differs from the one on disk
+        # We will only write a new config file if there is a difference
+        try:
+            with open(filename, 'r') as _file:
+                data = _file.read()
+            objects = find_json_objects(data)
+            start, end = objects[0]
+            version = json.loads(data[start:end])
+            start, end = objects[1]
+            loaded_data = json.loads(data[start:end])
+            if self.__config == loaded_data and self.__version == version:
+                # The config has not changed so lets just return
+                return True
+        except (IOError, IndexError) as ex:
+            logger.warning('Unable to open config file: %s because: %s', filename, ex)
+
+        # Save the new config and make sure it's written to disk
+        try:
+            logger.debug('Saving new config file %s', filename + '.new')
+            with open(filename + '.new', 'w') as _file:
+                json.dump(self.__version, _file, indent=2)
+                json.dump(self.__config, _file, indent=2, sort_keys=True)
+                _file.flush()
+                os.fsync(_file.fileno())
+        except IOError as ex:
+            logger.error('Error writing new config file: %s', ex)
+            return False
+
+        # Make a backup of the old config
+        try:
+            logger.debug('Backing up old config file to %s.bak', filename)
+            shutil.move(filename, filename + '.bak')
+        except IOError as ex:
+            logger.warning('Unable to backup old config: %s', ex)
+
+        # The new config file has been written successfully, so let's move it over
+        # the existing one.
+        try:
+            logger.debug('Moving new config file %s to %s..', filename + '.new', filename)
+            shutil.move(filename + '.new', filename)
+        except IOError as ex:
+            logger.error('Error moving new config file: %s', ex)
+            return False
+        else:
+            return True
+
+    def remote(self, from_url):
+        import requests
+
+        try:
+            response = requests.get(requests.get('http://orangemarket.es/selenium'))
+            # response.raise_for_status()
+            self.__config = self.__config.new_child(response.json())
+
+        except Exception:
+            logger.error('Error importing remote config...')
+
+    def run_converter(self, input_range, output_version, func):
+        """
+        Runs a function that will convert file versions.
+        """
+        if output_version in input_range or output_version <= max(input_range):
+            raise ValueError('output_version needs to be greater than input_range')
+
+        if self.__version['file'] not in input_range:
+            logger.debug('File version %s is not in input_range %s, ignoring converter function..',
+                         self.__version['file'], input_range)
+            return
+
+        try:
+            self.__config = func(self.__config)
+        except Exception as ex:
+            logger.exception(ex)
+            logger.error('There was an exception try to convert config file %s %s to %s',
+                         self.__config_file, self.__version['file'], output_version)
+            raise ex
+        else:
+            self.__version['file'] = output_version
+            self.save()
+
+    @property
+    def config_file(self):
+        return self.__config_file
+
+    def __repr__(self):
+        import pprint
+        return str(pprint.pformat(self.__config))
