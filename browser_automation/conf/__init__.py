@@ -7,6 +7,7 @@ from core.exceptions import ImproperlyConfigured
 from conf.config import Config
 
 
+VERSION = (1, 0, 0, 'alpha', 0)
 ENVIRONMENT_VARIABLE = "BROWSER_AUTOMATION_SETTINGS"
 
 class LazyConfig(LazyObject):
