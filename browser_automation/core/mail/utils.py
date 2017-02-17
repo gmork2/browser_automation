@@ -1,3 +1,7 @@
+import random
+import socket
+import time
+import os
 from email.header import Header
 from email.utils import getaddresses, parseaddr
 
@@ -92,3 +96,44 @@ def sanitize_address(addr, encoding):
         localpart, domain = split_addr(addr, encoding)
         address = Address(nm, username=localpart, domain=domain)
     return str(address)
+
+# Cache the hostname, but do it lazily: socket.getfqdn() can take a couple of
+# seconds, which slows down the restart of the server.
+class CachedDnsName(object):
+    def __str__(self):
+        return self.get_fqdn()
+
+    def get_fqdn(self):
+        if not hasattr(self, '_fqdn'):
+            self._fqdn = socket.getfqdn()
+        return self._fqdn
+
+DNS_NAME = CachedDnsName()
+
+# Copied from Python 3.2+ standard library, with the following modifications:
+# * Used cached hostname for performance.
+def make_msgid(idstring=None, domain=None):
+    """
+    Returns a string suitable for RFC 5322 compliant Message-ID, e.g:
+
+    <20020201195627.33539.96671@nightshade.la.mastaler.com>
+
+    Optional idstring if given is a string used to strengthen the
+    uniqueness of the message id.  Optional domain if given provides the
+    portion of the message id after the '@'.  It defaults to the locally
+    defined hostname.
+    """
+    timeval = time.time()
+    utcdate = time.strftime('%Y%m%d%H%M%S', time.gmtime(timeval))
+    pid = os.getpid()
+    randint = random.randrange(100000)
+    if idstring is None:
+        idstring = ''
+    else:
+        idstring = '.' + idstring
+    if domain is None:
+        # stdlib uses socket.getfqdn() here instead
+        domain = DNS_NAME
+    msgid = '<%s.%s.%s%s@%s>' % (utcdate, pid, randint, idstring, domain)
+    return msgid
+
