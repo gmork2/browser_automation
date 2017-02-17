@@ -5,6 +5,11 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# The email backend to use. The default is to use the SMTP backend.
+# Third-party backends can be specified by providing a Python path
+# to a module that defines an EmailBackend class.
+EMAIL_BACKEND = 'browser_automation.core.mail.smtp.EmailBackend'
+
 # The callable to use to configure logging
 LOGGING_CONFIG = 'logging.config.dictConfig'
 
