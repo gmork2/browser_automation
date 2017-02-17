@@ -36,6 +36,7 @@ EMAIL_USE_SSL = False
 EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
+
 # The callable to use to configure logging
 LOGGING_CONFIG = 'logging.config.dictConfig'
 

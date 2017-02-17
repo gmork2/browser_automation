@@ -5,6 +5,8 @@ import threading
 from email.header import Header
 from email.utils import getaddresses, parseaddr
 
+from utils.encoding import force_text
+
 
 class EmailBackend(object):
     """
