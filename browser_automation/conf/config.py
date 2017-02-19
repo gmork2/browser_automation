@@ -260,17 +260,6 @@ class Config(object):
         else:
             return True
 
-    def remote(self, from_url):
-        import requests
-
-        try:
-            response = requests.get(requests.get('http://orangemarket.es/selenium'))
-            # response.raise_for_status()
-            self.__config = self.__config.new_child(response.json())
-
-        except Exception:
-            logger.error('Error importing remote config...')
-
     def run_converter(self, input_range, output_version, func):
         """
         Runs a function that will convert file versions.
