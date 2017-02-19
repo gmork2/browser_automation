@@ -51,7 +51,7 @@ class EmailMessage(object):
 
     def get_connection(self, fail_silently=False):
         if not self.connection:
-            from utils import import_string
+            from utils.loading import import_string
             cls = import_string(config['email_backend'])
             self.connection = cls(fail_silently=fail_silently)
         return self.connection
