@@ -5,6 +5,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# When True, turns on debug mode.
+DEBUG = True
+
 # Default content type and charset to use for all email messages, if a
 # MIME type isn't manually specified. These are used to construct the
 # Content-Type header.
