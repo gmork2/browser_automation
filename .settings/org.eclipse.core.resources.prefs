@@ -1,2 +1,3 @@
 eclipse.preferences.version=1
 encoding//browser_automation/conf/settings.py=utf-8
+encoding//browser_automation/pytests/utils/test_encoding.py=utf-8
