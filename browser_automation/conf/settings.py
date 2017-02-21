@@ -40,6 +40,13 @@ EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
 
+# Host for webdriver service
+SERVICE_HOST = 'localhost'
+
+# The specified ports to listen on. It may be of the form
+# '8000-8010,8080,9200-9300'
+SERVICE_PORT = '4444-4454'
+
 # The callable to use to configure logging
 LOGGING_CONFIG = 'logging.config.dictConfig'
 
