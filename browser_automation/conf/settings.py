@@ -74,11 +74,6 @@ LOGGING = {
             'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
         },
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
         'file': {
             'level': 'DEBUG',
             'filters': ['require_debug_true'],
