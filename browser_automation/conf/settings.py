@@ -40,6 +40,10 @@ EMAIL_SSL_CERTFILE = None
 EMAIL_SSL_KEYFILE = None
 EMAIL_TIMEOUT = None
 
+# Use {HOST}, {PORT} or {FILE}
+SERVICE_OPTIONS = "--port={PORT}"
+SERVICE_EXECUTABLE = os.path.join(BASE_DIR, 'bin', 'drivers', 'chromedriver.exe')
+
 # Host for webdriver service
 SERVICE_HOST = 'localhost'
 

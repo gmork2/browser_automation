@@ -1,10 +1,15 @@
 import errno
 import logging
 import os
+import platform
+import shlex
+import shutil
 import socket
+import subprocess
 import threading
 from urllib import request
 
+from conf import config
 from core.webdriver.chromium import constants as command
 
 logger = logging.getLogger(__name__)
@@ -83,7 +88,30 @@ class LiveServerThread(threading.Thread):
         return response
 
     def _create_server(self, port):
-        raise NotImplemented
+        cmd = config['service_executable']
+        if os.path.exists(cmd) and os.path.isfile(cmd):
+            ext = os.path.splitext(cmd)[1].lower()
+        else:
+            raise OSError("Error trying to access executable service")
+
+        if ext.endswith('jar'):
+            java = shutil.which("java")
+            if java is None:
+                raise OSError(
+                    "Are you sure java is installed and available "
+                    "on your PATH environment variable?")
+            # Add extension as command parameter
+            cmd = ' '.join([java, ext.replace('.', '-'), cmd])
+        cmd = ' '.join([cmd, config.get('service_options', '')
+                        .format(HOST=self.host, PORT=port)])
+        try:
+            process = subprocess.Popen(
+                shlex.split(cmd, posix=False),
+                env=self.env, close_fds=platform.system() != 'Windows',
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except TypeError:
+            raise
+        return process
 
     def terminate(self):
         try:
