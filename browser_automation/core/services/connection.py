@@ -90,7 +90,7 @@ class LiveServerThread(threading.Thread):
             if hasattr(self, 'process') and self.process:
                 try:
                     cmd = self.get_url() + command.SHUTDOWN[1]
-                    response = request.urlopen(self.cmd, timeout=10).close()
+                    request.urlopen(cmd, timeout=10).close()
                 except:
                     logger.warning("Error trying to shutdown server")
 
