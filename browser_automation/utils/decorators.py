@@ -1,5 +1,5 @@
 import warnings
-from functools import wraps
+from functools import WRAPPER_ASSIGNMENTS, wraps
 
 
 try:
@@ -7,6 +7,19 @@ try:
 except ImportError:
     ContextDecorator = None
 
+if ContextDecorator is None:
+    # ContextDecorator was introduced in Python 3.2
+    # See https://docs.python.org/3/library/contextlib.html#contextlib.ContextDecorator
+    class ContextDecorator(object):
+        """
+        A base class that enables a context manager to also be used as a decorator.
+        """
+        def __call__(self, func):
+            @wraps(func, assigned=WRAPPER_ASSIGNMENTS)
+            def inner(*args, **kwargs):
+                with self:
+                    return func(*args, **kwargs)
+            return inner
 
 class classonlymethod(classmethod):
     def __get__(self, instance, cls=None):
