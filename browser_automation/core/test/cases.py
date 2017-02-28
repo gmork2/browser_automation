@@ -17,7 +17,7 @@ class LiveServerTestCase(unittest.TestCase):
     local machine.
     """
     @classproperty
-    def live_server_url(cls):
+    def live_server_url(cls):# @NoSelf
         return 'http://%s:%s' % (
             cls.server_thread.host, cls.server_thread.port)
 

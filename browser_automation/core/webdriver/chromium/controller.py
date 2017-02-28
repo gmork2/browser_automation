@@ -11,7 +11,7 @@ class Controller(object):
     def __init__(self, server_url):
         self._server_url = server_url
         port = int(server_url.split(':')[2].split('/')[0])
-        self._conn = http_client.HTTPConnection('127.0.0.1', port, timeout=30)
+        self._conn = http_client.HTTPConnection('127.0.0.1', port, timeout=30)# @UndefinedVariable
 
 
     def execute(self, command, params):

@@ -10,14 +10,14 @@ class TestClassProperty:
                 self.foo_attr = 456
 
             @classproperty
-            def foo(cls):
+            def foo(cls):# @NoSelf
                 return cls.foo_attr
 
         class Bar(object):
             bar = classproperty()
 
             @bar.getter
-            def bar(cls):
+            def bar(cls):# @NoSelf
                 return 123
 
         assert Foo.foo == 123
@@ -32,7 +32,7 @@ class TestClassProperty:
                 return 123
 
             @foo.getter
-            def foo(cls):
+            def foo(cls):# @NoSelf
                 return 456
 
         assert Foo.foo == 456
