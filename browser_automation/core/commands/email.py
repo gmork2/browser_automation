@@ -2,6 +2,7 @@ import socket
 
 from core.mail import send_mail
 from core.commands.base import Command
+from utils.timezone import now as tz_now
 
 
 class Aplication(Command):
@@ -15,7 +16,7 @@ class Aplication(Command):
         )
 
     def handle(self, *args, **kwargs):
-        subject = 'Test email from %s' % (socket.gethostname())
+        subject = 'Test email from %s on %s' % (socket.gethostname(), tz_now())
 
         send_mail(
             subject=subject,
@@ -23,3 +24,4 @@ class Aplication(Command):
             from_email=None,
             recipient_list=kwargs['email'],
         )
+
