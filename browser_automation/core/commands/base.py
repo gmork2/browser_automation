@@ -146,8 +146,8 @@ class Command(object):
 
         if options.settings:
             os.environ['BROWSER_AUTOMATION_SETTINGS'] = options.settings
-        elif not config.configured:
-            config.configure()
+        elif not config.configured: # @UndefinedVariable
+            config.configure() # @UndefinedVariable
 
         if options.pythonpath:
             sys.path.insert(0, options.pythonpath)
