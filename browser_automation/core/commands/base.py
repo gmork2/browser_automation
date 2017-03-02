@@ -4,7 +4,9 @@ Base classes for writing management commands.
 import os
 import sys
 
-from core.commands.exceptions import CommandError, SystemCheckError
+import pytest
+
+from core.commands.exceptions import SystemCheckError
 from utils.version import get_version
 from conf import config
 from core.commands.parser import CommandParser
@@ -163,13 +165,42 @@ class Command(object):
             pass
     
     def execute(self, *args, **options):
-        pass
-    
+        """
+        Try to execute this command, performing system checks if needed (as
+        controlled by the ``requires_system_checks`` attribute, except if
+        force-skipped).
+        """
+        try:
+            if self.requires_system_checks and not options.get('skip_checks'):
+                has_passed_tests = self.check()
+
+            output = self.handle(*args, **options)
+            if output:
+                self.stdout.write(output)
+        finally:
+            pass
+        return output
+
+    def _run_pytest_checks(self, **kwargs):
+        return bool(pytest.main())
+
+    def check(self, tags=None, display_num_errors=False,
+              include_deployment_checks=False, fail_level=40):
+        """
+        Uses the system check to validate entire Browser Automation project.
+        """
+        has_passed_tests = self._run_pytest_checks(
+            tags=tags,
+            display_num_errors=display_num_errors,
+            include_deployment_checks=include_deployment_checks,
+            fail_level=fail_level
+        )
+        return has_passed_tests
+
     def handle(self, *args, **options):
         """
         The actual logic of the command. Subclasses must implement
         this method.
         """
         raise NotImplementedError('subclasses of Command must provide a handle() method')
-
 
