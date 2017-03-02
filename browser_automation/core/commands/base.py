@@ -71,8 +71,9 @@ class Command(object):
     requires_system_checks = True
     
     def __init__(self, stdout=None, stderr=None):
-        pass
-    
+        self.stdout = stdout or sys.stdout
+        self.stderr = stderr or sys.stderr
+
     def get_version(self):
         """
         Return the current version, which should be correct for all built-in
@@ -88,7 +89,27 @@ class Command(object):
         """
         parser = CommandParser(self, prog="%s" % (prog_name), description=self.help or None)
         parser.add_argument('--version', action='version', version=self.get_version())
-    
+        parser.add_argument(
+            '-v', '--verbosity', action='store', dest='verbosity', default=1,
+            type=int, choices=[0, 1, 2, 3],
+            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output',
+        )
+        parser.add_argument(
+            '--skipchecks', action='store_true', dest='skip_checks',
+            help='Tells Browser Automation to skip all system checks',
+        )
+        parser.add_argument(
+            '--settings',
+            help=(
+                'The Python path to a settings module, e.g. '
+                'If this isn\'t provided, the BROWSER_AUTOMATION_SETTINGS '
+                'environment variable will be used.'
+            ),
+        )
+        parser.add_argument(
+            '--pythonpath',
+            help='A directory to add to the Python path, e.g. "/home/user/myproject".',
+        )
         self.add_arguments(parser)
         return parser
     
@@ -107,7 +128,39 @@ class Command(object):
         parser.print_help()
 
     def run_from_argv(self, argv):
-        pass
+        """
+        Set up any environment changes requested (e.g., Python path
+        and Browser Automation settings), then run this command. If the
+        command raises a ``CommandError``, intercept it and print it sensibly
+        to stderr.
+        """
+        parser = self.create_parser(argv[0])
+        options = parser.parse_args(argv[1:])
+
+        cmd_options = vars(options)
+
+        # Move positional args out of options to mimic legacy optparse
+        args = cmd_options.pop('args', ())
+
+        if options.settings:
+            os.environ['BROWSER_AUTOMATION_SETTINGS'] = options.settings
+        elif not config.configured:
+            config.configure()
+
+        if options.pythonpath:
+            sys.path.insert(0, options.pythonpath)
+
+        try:
+            self.execute(*args, **cmd_options)
+        except Exception as e:
+            # SystemCheckError takes care of its own formatting.
+            if isinstance(e, SystemCheckError):
+                self.stderr.write(str(e), lambda x: x)
+            else:
+                self.stderr.write('%s: %s' % (e.__class__.__name__, e))
+            sys.exit(1)
+        finally:
+            pass
     
     def execute(self, *args, **options):
         pass
@@ -118,3 +171,5 @@ class Command(object):
         this method.
         """
         raise NotImplementedError('subclasses of Command must provide a handle() method')
+
+
