@@ -71,6 +71,7 @@ class Command(object):
     
     # Configuration shortcuts that alter various logic.
     requires_system_checks = True
+    can_import_settings = False
     
     def __init__(self, stdout=None, stderr=None):
         self.stdout = stdout or sys.stdout
