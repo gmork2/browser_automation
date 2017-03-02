@@ -8,6 +8,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # When True, turns on debug mode.
 DEBUG = True
 
+# Local time zone for this installation. All choices can be found here:
+# https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
+# systems may support all possibilities). When USE_TZ is True, this is
+# interpreted as the default user time zone.
+TIME_ZONE = 'America/Chicago'
+
+# If you set this to True, will use timezone-aware datetimes.
+USE_TZ = False
+
 # Default content type and charset to use for all email messages, if a
 # MIME type isn't manually specified. These are used to construct the
 # Content-Type header.
