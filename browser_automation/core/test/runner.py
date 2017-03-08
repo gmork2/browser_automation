@@ -96,6 +96,7 @@ class _TestResult(unittest.TestResult):
         else:
             sys.stderr.write('F')
 
+
 class HTMLTestRunner(object):
     def __init__(self, stream=sys.stdout, descriptions=True, verbosity=1,
                  failfast=False, buffer=False, resultclass=None, warnings=None,
@@ -105,6 +106,20 @@ class HTMLTestRunner(object):
         self.description = None
         self.startTime = datetime.datetime.now()
         self.stream = stream
+    
+    def run(self, test):
+        """
+        Run the given test case or test suite.
+        """
+        result = _TestResult(self.verbosity)
+        test(result)
+        self.stopTime = datetime.datetime.now()
+        self.generate_report(test, result)
+        print("\nTime Elapsed: %s" % (self.stopTime - self.startTime), file=sys.stderr)
+        return result
+    
+    def generate_report(self, test, result):
+        pass
 
 
 class TestProgram(unittest.TestProgram):
