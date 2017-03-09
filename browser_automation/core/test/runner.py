@@ -118,6 +118,20 @@ class HTMLTestRunner(object):
         print("\nTime Elapsed: %s" % (self.stopTime - self.startTime), file=sys.stderr)
         return result
     
+    def sort_result(self, result_list):
+        # unittest does not seems to run in any particular order.
+        # Here at least we want to group them together by class.
+        rmap = {}
+        classes = []
+        for n,t,o,e in result_list:
+            cls = t.__class__
+            if not cls in rmap.keys():
+                rmap[cls] = []
+                classes.append(cls)
+            rmap[cls].append((n,t,o,e))
+        r = [(cls, rmap[cls]) for cls in classes]
+        return r
+    
     def generate_report(self, test, result):
         pass
 
