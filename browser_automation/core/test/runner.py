@@ -132,6 +132,28 @@ class HTMLTestRunner(object):
         r = [(cls, rmap[cls]) for cls in classes]
         return r
     
+    def get_report_attributes(self, result):
+        """
+        Return report attributes as a list of (name, value).
+        Override this to add custom attributes.
+        """
+        startTime = str(self.startTime)[:19]
+        duration = str(self.stopTime - self.startTime)
+        status = []
+        if result.success_count: status.append('Pass %s'    % result.success_count)
+        if result.failure_count: status.append('Failure %s' % result.failure_count)
+        if result.error_count:   status.append('Error %s'   % result.error_count  )
+        if status:
+            status = ' '.join(status)
+        else:
+            status = 'none'
+        return [
+            ('Start Time', startTime),
+            ('Duration', duration),
+            ('Status', status),
+        ]
+
+    
     def generate_report(self, test, result):
         pass
 
