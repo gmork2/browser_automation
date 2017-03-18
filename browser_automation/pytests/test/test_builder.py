@@ -21,28 +21,28 @@ class TestBuilder:
 
     def test_dotted_test_module(self):
         count = Builder(pattern='*.py').build_suite(
-            ["tests.test_discovery_sample"],
+            ['misc.tests.test_discovery_sample'],
         ).countTestCases()
 
         assert count == 3
 
     def test_dotted_test_class_more_tests(self):
         count = Builder().build_suite(
-            ["tests.test_discovery_sample.more_tests.do_sample.Test"],
+            ['misc.tests.test_discovery_sample.more_tests.do_sample.Test'],
         ).countTestCases()
 
         assert count == 1
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = Builder().build_suite(
-            ["tests.test_discovery_sample.do_sample.TestVanillaUnittest"],
+            ['misc.tests.test_discovery_sample.do_sample.TestVanillaUnittest'],
         ).countTestCases()
 
         assert count == 1
 
     def test_dotted_test_method_testcase(self):
         count = Builder().build_suite(
-            ["tests.test_discovery_sample.do_sample.TestSimpleTestCase.test_sample"],
+            ['misc.tests.test_discovery_sample.do_sample.TestSimpleTestCase.test_sample'],
         ).countTestCases()
 
         assert count == 1
@@ -50,26 +50,26 @@ class TestBuilder:
     def test_pattern(self):
         count = Builder(
             pattern="*.py",
-        ).build_suite(["tests.test_discovery_sample"]).countTestCases()
+        ).build_suite(['misc.tests.test_discovery_sample']).countTestCases()
 
         assert count == 3
 
     def test_empty_test_case(self):
         count = Builder().build_suite(
-            ["tests.test_discovery_sample.do_sample.EmptyTestCase"],
+            ['misc.tests.test_discovery_sample.do_sample.EmptyTestCase'],
         ).countTestCases()
 
         assert count == 0
 
     def test_discovery_on_package(self):
         count = Builder().build_suite(
-            ["tests.test_discovery_sample.more_tests"],
+            ['misc.tests.test_discovery_sample.more_tests'],
         ).countTestCases()
 
         assert count == 1
 
     def test_testcase_ordering(self):
-        suite = Builder().build_suite(['tests.test_discovery_sample.do_sample'])
+        suite = Builder().build_suite(['misc.tests.test_discovery_sample.do_sample'])
         assert suite._tests[0].__class__.__name__ == 'TaggedTestCase', \
             "TaggedTestCase should be the first test case"
         assert suite._tests[2].__class__.__name__ == 'TestSimpleTestCase', \
@@ -82,7 +82,7 @@ class TestBuilder:
         #Reverse should reorder tests while maintaining the grouping specified
         #by ``Builder.reorder_by``.
         runner = Builder(reverse=True)
-        suite = runner.build_suite(test_labels=(['tests.test_discovery_sample.do_sample']))
+        suite = runner.build_suite(test_labels=(['misc.tests.test_discovery_sample.do_sample']))
 
         suite = tuple(suite)
         assert 'doctests' in suite[0].id(), "Test groups should not be reversed."
@@ -102,19 +102,18 @@ class TestBuilder:
 
     def test_tags(self):
         runner = Builder(tags=['core'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 1
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 1
         runner = Builder(tags=['fast'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 2
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 2
         runner = Builder(tags=['slow'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 2
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 2
         runner = Builder(tags=['tiny'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 0
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 0
 
     def test_exclude_tags(self):
         runner = Builder(tags=['fast'], exclude_tags=['core'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 1
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 1
         runner = Builder(tags=['fast'], exclude_tags=['slow'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 0
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 0
         runner = Builder(exclude_tags=['slow'])
-        assert runner.build_suite(['tests.test_discovery_sample.do_sample']).countTestCases() == 3
-
+        assert runner.build_suite(['misc.tests.test_discovery_sample.do_sample']).countTestCases() == 3
