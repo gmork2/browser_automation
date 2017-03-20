@@ -216,3 +216,85 @@ HEADING_TEMPLATE = """<div class='heading'>
 
 HEADING_ATTRIBUTE_TEMPLATE = """<p class='attribute'><strong>%(name)s:</strong> %(value)s</p>"""
 
+REPORT_TEMPLATE = """
+<p id='show_detail_line'>Show
+<a href='javascript:showCase(0)'>Summary</a>
+<a href='javascript:showCase(1)'>Failed</a>
+<a href='javascript:showCase(2)'>All</a>
+</p>
+<table id='result_table'>
+<colgroup>
+<col align='left' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+<col align='right' />
+</colgroup>
+<tr id='header_row'>
+    <td>Test Group/Test case</td>
+    <td>Count</td>
+    <td>Pass</td>
+    <td>Fail</td>
+    <td>Error</td>
+    <td>View</td>
+</tr>
+%(test_list)s
+<tr id='total_row'>
+    <td>Total</td>
+    <td>%(count)s</td>
+    <td>%(Pass)s</td>
+    <td>%(fail)s</td>
+    <td>%(error)s</td>
+    <td>&nbsp;</td>
+</tr>
+</table>
+"""
+
+REPORT_CLASS_TEMPLATE = r"""
+<tr class='%(style)s'>
+    <td>%(desc)s</td>
+    <td>%(count)s</td>
+    <td>%(Pass)s</td>
+    <td>%(fail)s</td>
+    <td>%(error)s</td>
+    <td><a href="javascript:showClassDetail('%(cid)s',%(count)s)">Detail</a></td>
+</tr>
+"""
+
+REPORT_TEST_WITH_OUTPUT_TEMPLATE = r"""
+<tr id='%(tid)s' class='%(Class)s'>
+    <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
+    <td colspan='5' align='center'>
+
+    <!--css div popup start-->
+    <a class="popup_link" onfocus='this.blur();' href="javascript:showTestDetail('div_%(tid)s')" >
+        %(status)s</a>
+
+    <div id='div_%(tid)s' class="popup_window">
+        <div style='text-align: right; color:red;cursor:pointer'>
+        <a onfocus='this.blur();' onclick="document.getElementById('div_%(tid)s').style.display = 'none' " >
+           [x]</a>
+        </div>
+        <pre>
+        %(script)s
+        </pre>
+    </div>
+    <!--css div popup end-->
+    </td>
+</tr>
+"""
+
+REPORT_TEST_NO_OUTPUT_TEMPLATE = r"""
+<tr id='%(tid)s' class='%(Class)s'>
+    <td class='%(style)s'><div class='testcase'>%(desc)s</div></td>
+    <td colspan='5' align='center'>%(status)s</td>
+</tr>
+"""
+
+REPORT_TEST_OUTPUT_TEMPLATE = r"""
+%(id)s: %(output)s
+"""
+
+ENDING_TEMPLATE = """<div id='ending'>&nbsp;</div>"""
+
