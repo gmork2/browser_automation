@@ -207,5 +207,12 @@ a.popup_link:hover {
 </style>
 """
 
+HEADING_TEMPLATE = """<div class='heading'>
+<h1>%(title)s</h1>
+%(parameters)s
+<p class='description'>%(description)s</p>
+</div>
+"""
 
+HEADING_ATTRIBUTE_TEMPLATE = """<p class='attribute'><strong>%(name)s:</strong> %(value)s</p>"""
 
