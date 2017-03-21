@@ -3,8 +3,10 @@ import datetime
 from io import StringIO
 import sys
 import os
+from xml.sax import saxutils
 
 from conf import config
+from utils.version import get_version
 from utils.stream import stdout_redirector, stderr_redirector
 from misc.template import (DEFAULT_TITLE, DEFAULT_DESCRIPTION,
     ENDING_TEMPLATE, HEADING_ATTRIBUTE_TEMPLATE, HEADING_TEMPLATE,
@@ -162,8 +164,22 @@ class HTMLTestRunner(object):
         ]
 
     
-    def generate_report(self, test, result):
-        pass
+        def generate_report(self, test, result):
+            report_attrs = self.get_report_attributes(result)
+            generator = 'Browser Automation %s' % get_version()
+            stylesheet = self._generate_stylesheet()
+            heading = self._generate_heading(report_attrs)
+            report = self._generate_report(result)
+            ending = self._generate_ending()
+            output = HTML_TEMPLATE % dict(
+                title = saxutils.escape(self.title),
+                generator = generator,
+                stylesheet = stylesheet,
+                heading = heading,
+                report = report,
+                ending = ending,
+            )
+            self.stream.write(output)
 
 
 class TestProgram(unittest.TestProgram):
