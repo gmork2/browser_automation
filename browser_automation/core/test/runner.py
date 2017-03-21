@@ -163,7 +163,6 @@ class HTMLTestRunner(object):
             ('Status', status),
         ]
 
-    
     def generate_report(self, test, result):
         report_attrs = self.get_report_attributes(result)
         generator = 'Browser Automation %s' % get_version()
@@ -180,7 +179,9 @@ class HTMLTestRunner(object):
             ending = ending,
         )
         self.stream.write(output)
-        
+    
+    def _generate_stylesheet(self):
+        return STYLESHEET_TEMPLATE
 
 class TestProgram(unittest.TestProgram):
     """
