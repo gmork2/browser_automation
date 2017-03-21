@@ -2,8 +2,15 @@ import unittest
 import datetime
 from io import StringIO
 import sys
+import os
 
+from conf import config
 from utils.stream import stdout_redirector, stderr_redirector
+from misc.template import (DEFAULT_TITLE, DEFAULT_DESCRIPTION,
+    ENDING_TEMPLATE, HEADING_ATTRIBUTE_TEMPLATE, HEADING_TEMPLATE,
+    HTML_TEMPLATE, REPORT_CLASS_TEMPLATE, REPORT_TEMPLATE,
+    REPORT_TEST_NO_OUTPUT_TEMPLATE, REPORT_TEST_OUTPUT_TEMPLATE,
+    REPORT_TEST_WITH_OUTPUT_TEMPLATE, STATUS, STYLESHEET_TEMPLATE)
 
 
 class _TestResult(unittest.TestResult):
@@ -102,10 +109,11 @@ class HTMLTestRunner(object):
                  failfast=False, buffer=False, resultclass=None, warnings=None,
                  *, tb_locals=False, **kwargs):
         self.verbosity = verbosity
-        self.title = None
-        self.description = None
+        self.title = DEFAULT_TITLE
+        self.description = DEFAULT_DESCRIPTION
         self.startTime = datetime.datetime.now()
         self.stream = stream
+        path = os.path.join(config['template_dir'], 'default')
     
     def run(self, test):
         """
