@@ -240,6 +240,35 @@ class HTMLTestRunner(object):
         )
         return report
 
+    def _generate_report_test(self, rows, cid, tid, n, t, o, e):
+        # e.g. 'pt1.1', 'ft1.1', etc
+        has_output = bool(o or e)
+        tid = (n == 0 and 'p' or 'f') + 't%s.%s' % (cid+1,tid+1)
+        name = t.id().split('.')[-1]
+        doc = t.shortDescription() or ""
+        desc = doc and ('%s: %s' % (name, doc)) or name
+        tmpl = has_output and REPORT_TEST_WITH_OUTPUT_TEMPLATE or REPORT_TEST_NO_OUTPUT_TEMPLATE
+
+        uo = o if isinstance(o, str) else o.decode()
+        ue = e if isinstance(e, str) else e.decode()
+
+        script = REPORT_TEST_OUTPUT_TEMPLATE % dict(
+            id = tid,
+            output = saxutils.escape(uo+ue),
+        )
+
+        row = tmpl % dict(
+            tid = tid,
+            Class = (n == 0 and 'hiddenRow' or 'none'),
+            style = n == 2 and 'errorCase' or (n == 1 and 'failCase' or 'none'),
+            desc = desc,
+            script = script,
+            status = STATUS[n],
+        )
+        rows.append(row)
+        if not has_output:
+            return
+
     def _generate_ending(self):
         return ENDING_TEMPLATE
 
