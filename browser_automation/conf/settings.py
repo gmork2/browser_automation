@@ -52,6 +52,8 @@ EMAIL_TIMEOUT = None
 # Templates folders
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
+USE_JINJA = False
+
 # Use {HOST}, {PORT} or {FILE}
 SERVICE_OPTIONS = "--port={PORT}"
 SERVICE_EXECUTABLE = os.path.join(BASE_DIR, 'bin', 'drivers', 'chromedriver.exe')
