@@ -240,6 +240,9 @@ class HTMLTestRunner(object):
         )
         return report
 
+    def _generate_ending(self):
+        return ENDING_TEMPLATE
+
 
 class TestProgram(unittest.TestProgram):
     """
