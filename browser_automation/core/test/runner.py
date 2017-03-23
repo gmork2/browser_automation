@@ -182,6 +182,21 @@ class HTMLTestRunner(object):
     
     def _generate_stylesheet(self):
         return STYLESHEET_TEMPLATE
+    
+    def _generate_heading(self, report_attrs):
+        a_lines = []
+        for name, value in report_attrs:
+            line = self.HEADING_ATTRIBUTE_TMPL % dict(
+                    name = saxutils.escape(name),
+                    value = saxutils.escape(value),
+                )
+            a_lines.append(line)
+        heading = self.HEADING_TMPL % dict(
+            title = saxutils.escape(self.title),
+            parameters = ''.join(a_lines),
+            description = saxutils.escape(self.description),
+        )
+        return heading
 
 class TestProgram(unittest.TestProgram):
     """
