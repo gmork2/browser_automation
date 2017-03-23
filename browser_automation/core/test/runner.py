@@ -197,7 +197,48 @@ class HTMLTestRunner(object):
             description = saxutils.escape(self.description),
         )
         return heading
-    
+
+    def _generate_report(self, result):
+        rows = []
+        sortedResult = self.sort_result(result.result)
+        for cid, (cls, cls_results) in enumerate(sortedResult):
+            # subtotal for a class
+            np = nf = ne = 0
+            for n,t,o,e in cls_results:
+                if n == 0: np += 1
+                elif n == 1: nf += 1
+                else: ne += 1
+
+            # format class description
+            if cls.__module__ == "__main__":
+                name = cls.__name__
+            else:
+                name = "%s.%s" % (cls.__module__, cls.__name__)
+            doc = cls.__doc__ and cls.__doc__.split("\n")[0] or ""
+            desc = doc and '%s: %s' % (name, doc) or name
+
+            row = REPORT_CLASS_TEMPLATE % dict(
+                style = ne > 0 and 'errorClass' or nf > 0 and 'failClass' or 'passClass',
+                desc = desc,
+                count = np+nf+ne,
+                Pass = np,
+                fail = nf,
+                error = ne,
+                cid = 'c%s' % (cid+1),
+            )
+            rows.append(row)
+
+            for tid, (n,t,o,e) in enumerate(cls_results):
+                self._generate_report_test(rows, cid, tid, n, t, o, e)
+
+        report = REPORT_TEMPLATE % dict(
+            test_list = ''.join(rows),
+            count = str(result.success_count+result.failure_count+result.error_count),
+            Pass = str(result.success_count),
+            fail = str(result.failure_count),
+            error = str(result.error_count),
+        )
+        return report
 
 
 class TestProgram(unittest.TestProgram):
