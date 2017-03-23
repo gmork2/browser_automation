@@ -186,12 +186,12 @@ class HTMLTestRunner(object):
     def _generate_heading(self, report_attrs):
         a_lines = []
         for name, value in report_attrs:
-            line = self.HEADING_ATTRIBUTE_TEMPLATE % dict(
+            line = HEADING_ATTRIBUTE_TEMPLATE % dict(
                     name = saxutils.escape(name),
                     value = saxutils.escape(value),
                 )
             a_lines.append(line)
-        heading = self.HEADING_TEMPLATE % dict(
+        heading = HEADING_TEMPLATE % dict(
             title = saxutils.escape(self.title),
             parameters = ''.join(a_lines),
             description = saxutils.escape(self.description),
