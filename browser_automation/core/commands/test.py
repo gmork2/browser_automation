@@ -62,6 +62,7 @@ class Aplication(Command):
             os.environ['BROWSER_AUTOMATION_SERVER_ADDRESS'] = options['liveserver']
         del options['liveserver']
         
+        # What do I have to do?
         builder = Builder(pattern="do_*.py", test_runner=TestRunner)
         suite, result = builder.run_tests(['tasks'])
 
