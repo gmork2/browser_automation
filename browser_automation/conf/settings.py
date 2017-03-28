@@ -52,6 +52,8 @@ EMAIL_TIMEOUT = None
 # Templates folders
 TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
 
+# Current aplication
+APP = 'core.commands.test.Aplication'
 USE_JINJA = False
 
 # Use {HOST}, {PORT} or {FILE}
