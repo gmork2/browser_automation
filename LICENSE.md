@@ -1,5 +1,10 @@
+<<<<<<< HEAD
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
+=======
+				  GNU GENERAL PUBLIC LICENSE
+					  Version 3, 29 June 2007
+>>>>>>> b5b60d31a18efa574725925dd124ae7f41818425
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
@@ -671,4 +676,8 @@ into proprietary programs.  If your program is a subroutine library, you
 may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
+<<<<<<< HEAD
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
+=======
+<http://www.gnu.org/philosophy/why-not-lgpl.html>.
+>>>>>>> b5b60d31a18efa574725925dd124ae7f41818425

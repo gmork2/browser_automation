@@ -182,6 +182,96 @@ class HTMLTestRunner(object):
     
     def _generate_stylesheet(self):
         return STYLESHEET_TEMPLATE
+    
+    def _generate_heading(self, report_attrs):
+        a_lines = []
+        for name, value in report_attrs:
+            line = HEADING_ATTRIBUTE_TEMPLATE % dict(
+                    name = saxutils.escape(name),
+                    value = saxutils.escape(value),
+                )
+            a_lines.append(line)
+        heading = HEADING_TEMPLATE % dict(
+            title = saxutils.escape(self.title),
+            parameters = ''.join(a_lines),
+            description = saxutils.escape(self.description),
+        )
+        return heading
+
+    def _generate_report(self, result):
+        rows = []
+        sortedResult = self.sort_result(result.result)
+        for cid, (cls, cls_results) in enumerate(sortedResult):
+            # subtotal for a class
+            np = nf = ne = 0
+            for n,t,o,e in cls_results:
+                if n == 0: np += 1
+                elif n == 1: nf += 1
+                else: ne += 1
+
+            # format class description
+            if cls.__module__ == "__main__":
+                name = cls.__name__
+            else:
+                name = "%s.%s" % (cls.__module__, cls.__name__)
+            doc = cls.__doc__ and cls.__doc__.split("\n")[0] or ""
+            desc = doc and '%s: %s' % (name, doc) or name
+
+            row = REPORT_CLASS_TEMPLATE % dict(
+                style = ne > 0 and 'errorClass' or nf > 0 and 'failClass' or 'passClass',
+                desc = desc,
+                count = np+nf+ne,
+                Pass = np,
+                fail = nf,
+                error = ne,
+                cid = 'c%s' % (cid+1),
+            )
+            rows.append(row)
+
+            for tid, (n,t,o,e) in enumerate(cls_results):
+                self._generate_report_test(rows, cid, tid, n, t, o, e)
+
+        report = REPORT_TEMPLATE % dict(
+            test_list = ''.join(rows),
+            count = str(result.success_count+result.failure_count+result.error_count),
+            Pass = str(result.success_count),
+            fail = str(result.failure_count),
+            error = str(result.error_count),
+        )
+        return report
+
+    def _generate_report_test(self, rows, cid, tid, n, t, o, e):
+        # e.g. 'pt1.1', 'ft1.1', etc
+        has_output = bool(o or e)
+        tid = (n == 0 and 'p' or 'f') + 't%s.%s' % (cid+1,tid+1)
+        name = t.id().split('.')[-1]
+        doc = t.shortDescription() or ""
+        desc = doc and ('%s: %s' % (name, doc)) or name
+        tmpl = has_output and REPORT_TEST_WITH_OUTPUT_TEMPLATE or REPORT_TEST_NO_OUTPUT_TEMPLATE
+
+        uo = o if isinstance(o, str) else o.decode()
+        ue = e if isinstance(e, str) else e.decode()
+
+        script = REPORT_TEST_OUTPUT_TEMPLATE % dict(
+            id = tid,
+            output = saxutils.escape(uo+ue),
+        )
+
+        row = tmpl % dict(
+            tid = tid,
+            Class = (n == 0 and 'hiddenRow' or 'none'),
+            style = n == 2 and 'errorCase' or (n == 1 and 'failCase' or 'none'),
+            desc = desc,
+            script = script,
+            status = STATUS[n],
+        )
+        rows.append(row)
+        if not has_output:
+            return
+
+    def _generate_ending(self):
+        return ENDING_TEMPLATE
+
 
 class TestProgram(unittest.TestProgram):
     """
