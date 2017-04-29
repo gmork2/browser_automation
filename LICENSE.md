@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-                    GNU GENERAL PUBLIC LICENSE
-                       Version 3, 29 June 2007
-=======
+
 				  GNU GENERAL PUBLIC LICENSE
 					  Version 3, 29 June 2007
->>>>>>> b5b60d31a18efa574725925dd124ae7f41818425
+
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
